@@ -68,7 +68,7 @@ export default function RootLayout() {
       ...metrics,
       insets: {
         ...metrics.insets,
-        top: Math.max(metrics.insets.top, 18),
+        top: Math.max(metrics.insets.top, 28),
         bottom: Math.max(metrics.insets.bottom, 12),
       },
     };

@@ -32,14 +32,16 @@ export default function StartDancingScreen() {
   return (
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]" edges={['top', 'bottom', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.topBar}>
-          <Pressable onPress={() => router.replace(AppRoutes.home)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
-            <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
-          </Pressable>
-          <Text style={styles.pageTitle}>开始跳舞</Text>
-          <Pressable onPress={() => router.push(AppRoutes.groups)} style={({ pressed }) => [styles.sideButton, pressed && styles.pressed]}>
-            <Text style={styles.sideButtonText}>舞队</Text>
-          </Pressable>
+        <View style={styles.headerShell}>
+          <View style={styles.topBar}>
+            <Pressable onPress={() => router.replace(AppRoutes.home)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
+              <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
+            </Pressable>
+            <Text style={styles.pageTitle}>开始跳舞</Text>
+            <Pressable onPress={() => router.push(AppRoutes.groups)} style={({ pressed }) => [styles.sideButton, pressed && styles.pressed]}>
+              <Text style={styles.sideButtonText}>舞队</Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.heroCard}>
@@ -96,15 +98,24 @@ export default function StartDancingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
+    paddingTop: 4,
     paddingBottom: 40,
     gap: 18,
+  },
+  headerShell: {
+    paddingTop: 10,
+    paddingBottom: 8,
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 24,
+    backgroundColor: '#FFFDF9',
+    borderWidth: 1,
+    borderColor: '#EFE6DB',
   },
   backButton: {
     width: 48,

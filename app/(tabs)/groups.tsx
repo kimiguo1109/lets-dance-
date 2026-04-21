@@ -17,9 +17,11 @@ export default function GroupsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
         ListHeaderComponent={
-          <View style={styles.headerCard}>
-            <Text style={styles.title}>附近舞团</Text>
-            <Text style={styles.subtitle}>按距离从近到远排列，点一下就能查看详情。</Text>
+          <View style={styles.headerShell}>
+            <View style={styles.headerCard}>
+              <Text style={styles.title}>附近舞团</Text>
+              <Text style={styles.subtitle}>按距离从近到远排列，点一下就能查看详情。</Text>
+            </View>
           </View>
         }
         renderItem={({ item: group }) => (
@@ -41,21 +43,26 @@ export default function GroupsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 16,
+    paddingTop: 8,
     paddingBottom: 160,
+  },
+  headerShell: {
+    paddingTop: 10,
+    paddingBottom: 18,
   },
   headerCard: {
     borderRadius: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFDF9',
     paddingHorizontal: 20,
-    paddingTop: 22,
+    paddingTop: 24,
     paddingBottom: 22,
+    borderWidth: 1,
+    borderColor: '#EFE6DB',
     shadowColor: '#E9D8C7',
     shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 1,
-    marginBottom: 16,
   },
   title: {
     fontSize: 30,

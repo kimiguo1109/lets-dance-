@@ -30,12 +30,12 @@ export default function MeScreen() {
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.title}>我的</Text>
-          <Text style={styles.subtitle}>只保留老人最常用的头像和昵称设置。</Text>
+          <Text style={styles.subtitle}>只保留常用设置，头像、昵称和登录方式一眼能看清。</Text>
 
           <View style={styles.avatarSection}>
             <ProfileAvatar uri={avatarUri} fallback={nickname || '舞'} />
             <Pressable onPress={handleAvatar} style={({ pressed }) => [styles.pickButton, pressed && styles.pressed]}>
-              <IconSymbol name="camera.fill" size={26} color="#FFFFFF" />
+              <IconSymbol name="camera.fill" size={24} color="#FFFFFF" />
               <Text style={styles.pickButtonText}>换头像</Text>
             </Pressable>
           </View>
@@ -74,14 +74,14 @@ export default function MeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
-    paddingBottom: 144,
+    paddingTop: 16,
+    paddingBottom: 156,
   },
   card: {
     borderRadius: 30,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-    paddingVertical: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 22,
   },
   title: {
     fontSize: 30,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: 28,
+    paddingVertical: 26,
     gap: 16,
   },
   pickButton: {
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderRadius: 24,
+    paddingHorizontal: 22,
+    paddingVertical: 15,
+    borderRadius: 22,
     backgroundColor: '#FF7A12',
   },
   pickButtonText: {
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 21,
+    lineHeight: 27,
     fontWeight: '900',
     color: '#FFFFFF',
   },
@@ -127,12 +127,12 @@ const styles = StyleSheet.create({
     color: '#241F1A',
   },
   input: {
-    borderRadius: 24,
+    borderRadius: 22,
     backgroundColor: '#F6F1EA',
     paddingHorizontal: 18,
-    paddingVertical: 18,
-    fontSize: 22,
-    lineHeight: 28,
+    paddingVertical: 16,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: '700',
     color: '#241F1A',
   },
@@ -151,25 +151,25 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoValue: {
-    fontSize: 21,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
     color: '#74685E',
   },
   saveButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 26,
+    borderRadius: 24,
     backgroundColor: '#D91E12',
-    paddingVertical: 18,
+    paddingVertical: 17,
   },
   saveButtonText: {
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 22,
+    lineHeight: 28,
     fontWeight: '900',
     color: '#FFFFFF',
   },
   pressed: {
     opacity: 0.93,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
   },
 });

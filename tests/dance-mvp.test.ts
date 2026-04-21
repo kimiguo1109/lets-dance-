@@ -4,6 +4,7 @@ import type { TrpcContext } from '../server/_core/context';
 import { appRouter } from '../server/routers';
 import { buildMapUrl, createGroupName, formatDistance, getGroupStatus, searchGroups } from '../lib/dance-utils';
 import { SEEDED_GROUPS } from '../lib/dance-data';
+import { AppRoutes, getBackRoute } from '../lib/app-routes';
 
 function createPublicContext(): TrpcContext {
   return {
@@ -47,6 +48,24 @@ describe('dance utils', () => {
     expect(url).toContain('maps.apple.com');
     expect(url).toContain('31.2281');
     expect(url).toContain('121.4742');
+  });
+});
+
+describe('app routes', () => {
+  it('builds typed group and share destinations with clear back targets', () => {
+    expect(AppRoutes.group('group-1', 'groups')).toEqual({
+      pathname: '/group/[id]',
+      params: { id: 'group-1', from: 'groups' },
+    });
+
+    expect(AppRoutes.share('group-2', 'start')).toEqual({
+      pathname: '/share-card',
+      params: { groupId: 'group-2', from: 'start' },
+    });
+
+    expect(getBackRoute('voice')).toBe('/voice-search');
+    expect(getBackRoute('groups')).toBe('/(tabs)/groups');
+    expect(getBackRoute('unknown')).toBe('/(tabs)/groups');
   });
 });
 

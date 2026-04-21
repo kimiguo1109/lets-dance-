@@ -68,7 +68,7 @@ export default function RootLayout() {
       ...metrics,
       insets: {
         ...metrics.insets,
-        top: Math.max(metrics.insets.top, 16),
+        top: Math.max(metrics.insets.top, 18),
         bottom: Math.max(metrics.insets.bottom, 12),
       },
     };
@@ -79,13 +79,13 @@ export default function RootLayout() {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DanceAppProvider>
-            <Stack screenOptions={{ headerShown: false }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FBF8F2' } }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="oauth/callback" />
               <Stack.Screen name="group/[id]" />
               <Stack.Screen name="voice-search" />
               <Stack.Screen name="start-dancing" />
-              <Stack.Screen name="share-card" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="share-card" options={{ presentation: 'transparentModal' }} />
             </Stack>
             <StatusBar style="dark" />
           </DanceAppProvider>

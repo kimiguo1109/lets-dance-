@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { PrimaryButton } from '@/components/dance-ui';
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AppRoutes } from '@/lib/app-routes';
 import { useDanceApp } from '@/lib/dance-app-context';
 import { formatDistance } from '@/lib/dance-utils';
 
@@ -31,37 +33,36 @@ export default function StartDancingScreen() {
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]" edges={['top', 'bottom', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
-            <IconSymbol name="chevron.right" size={30} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
+          <Pressable onPress={() => router.replace(AppRoutes.home)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
+            <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
           </Pressable>
           <Text style={styles.pageTitle}>开始跳舞</Text>
-          <View style={styles.topPlaceholder} />
+          <Pressable onPress={() => router.push(AppRoutes.groups)} style={({ pressed }) => [styles.sideButton, pressed && styles.pressed]}>
+            <Text style={styles.sideButtonText}>舞队</Text>
+          </Pressable>
         </View>
 
         <View style={styles.heroCard}>
-          <Text style={styles.heroSubtitle}>这条路径会依次完成定位、拍照、附近判断、创建或加入舞团。</Text>
+          <Text style={styles.heroTitle}>四步完成</Text>
+          <Text style={styles.heroSubtitle}>定位、拍照、判断附近舞团，再自动加入或创建，主路径保持尽量简单。</Text>
           <View style={styles.stepsWrap}>
             <StepRow index={1} label="获取当前位置" />
             <StepRow index={2} label="拍一张现场照片" />
             <StepRow index={3} label="优先加入 200 米内舞团" />
             <StepRow index={4} label="没有舞团时创建新舞团" />
           </View>
-          <Pressable onPress={() => handleStart(false)} style={({ pressed }) => [styles.primaryAction, pressed && styles.pressed]}>
-            <IconSymbol name="play.circle.fill" size={34} color="#FFFFFF" />
-            <Text style={styles.primaryActionText}>立即开始</Text>
-          </Pressable>
-          <Pressable onPress={() => handleStart(true)} style={({ pressed }) => [styles.secondaryAction, pressed && styles.pressed]}>
-            <IconSymbol name="plus.circle.fill" size={30} color="#241F1A" />
-            <Text style={styles.secondaryActionText}>附近有舞团也创建新的</Text>
-          </Pressable>
+          <View style={styles.actionGap}>
+            <PrimaryButton label="立即开始" icon="play.circle.fill" onPress={() => handleStart(false)} />
+            <PrimaryButton label="直接创建新的舞团" icon="plus.circle.fill" tone="light" onPress={() => handleStart(true)} />
+          </View>
         </View>
 
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>附近可加入舞团</Text>
-          <Text style={styles.sectionSubtitle}>如果你只想先看看，也可以直接进入详情。</Text>
+          <Text style={styles.sectionSubtitle}>如果你只想先看看，也可以点进去看详情。</Text>
           <View style={styles.groupList}>
-            {nearbyGroups.slice(0, 2).map((group) => (
-              <Pressable key={group.id} onPress={() => router.push(`/group/${group.id}`)} style={({ pressed }) => [styles.groupRow, pressed && styles.pressed]}>
+            {nearbyGroups.slice(0, 3).map((group) => (
+              <Pressable key={group.id} onPress={() => router.push(AppRoutes.group(group.id, 'start'))} style={({ pressed }) => [styles.groupRow, pressed && styles.pressed]}>
                 <View style={styles.groupInfo}>
                   <Text style={styles.groupName}>{group.name}</Text>
                   <Text style={styles.groupMeta}>队长：{group.captainName}</Text>
@@ -81,13 +82,10 @@ export default function StartDancingScreen() {
           <View style={styles.resultCard}>
             <Text style={styles.resultTitle}>本次结果</Text>
             <Text style={styles.resultText}>你已{result.type === 'created' ? '创建' : '加入'}“{result.group.name}”。</Text>
-            <View style={styles.resultActions}>
-              <Pressable onPress={() => router.push(`/group/${result.group.id}`)} style={({ pressed }) => [styles.resultButton, pressed && styles.pressed]}>
-                <Text style={styles.resultButtonText}>查看详情</Text>
-              </Pressable>
-              <Pressable onPress={() => router.push('/share-card')} style={({ pressed }) => [styles.resultButtonLight, pressed && styles.pressed]}>
-                <Text style={styles.resultButtonLightText}>分享卡片</Text>
-              </Pressable>
+            <View style={styles.actionGap}>
+              <PrimaryButton label="查看舞团详情" icon="person.2.fill" onPress={() => router.push(AppRoutes.group(result.group.id, 'start'))} />
+              <PrimaryButton label="分享卡片" icon="arrow.triangle.turn.up.right.diamond.fill" tone="light" onPress={() => router.push(AppRoutes.share(result.group.id, 'start'))} />
+              <PrimaryButton label="回到首页" icon="house.fill" tone="light" onPress={() => router.replace(AppRoutes.home)} />
             </View>
           </View>
         ) : null}
@@ -98,7 +96,7 @@ export default function StartDancingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 10,
+    paddingTop: 12,
     paddingBottom: 40,
     gap: 18,
   },
@@ -106,168 +104,153 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 8,
+    paddingBottom: 6,
   },
   backButton: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
-  topPlaceholder: {
-    width: 52,
-    height: 52,
+  sideButton: {
+    minWidth: 56,
+    height: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF8EF',
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#EEDFCF',
+  },
+  sideButtonText: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '800',
+    color: '#241F1A',
   },
   pageTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: '900',
-    color: '#241F1A',
-  },
-  heroCard: {
-    borderRadius: 32,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 22,
-    shadowColor: '#E9D8C7',
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1,
-  },
-  heroSubtitle: {
-    fontSize: 19,
-    lineHeight: 30,
-    color: '#74685E',
-    marginBottom: 18,
-  },
-  stepsWrap: {
-    gap: 14,
-    marginBottom: 22,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  stepBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFEDD8',
-  },
-  stepBadgeText: {
-    fontSize: 20,
-    lineHeight: 24,
-    fontWeight: '900',
-    color: '#D75A18',
-  },
-  stepText: {
-    flex: 1,
-    fontSize: 22,
-    lineHeight: 30,
-    fontWeight: '800',
-    color: '#D75A18',
-  },
-  primaryAction: {
-    marginBottom: 14,
-    minHeight: 68,
-    borderRadius: 26,
-    backgroundColor: '#D91E12',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  primaryActionText: {
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
-  secondaryAction: {
-    minHeight: 68,
-    borderRadius: 26,
-    backgroundColor: '#FFF8EF',
-    borderWidth: 1,
-    borderColor: '#F0E4D6',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  secondaryActionText: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '900',
-    color: '#241F1A',
-  },
-  sectionCard: {
-    borderRadius: 32,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 22,
-  },
-  sectionTitle: {
     fontSize: 30,
     lineHeight: 36,
     fontWeight: '900',
     color: '#241F1A',
   },
+  heroCard: {
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    gap: 16,
+  },
+  heroTitle: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
+  heroSubtitle: {
+    fontSize: 18,
+    lineHeight: 28,
+    color: '#74685E',
+  },
+  stepsWrap: {
+    gap: 12,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  stepBadge: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFEDD8',
+  },
+  stepBadgeText: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: '900',
+    color: '#D75A18',
+  },
+  stepText: {
+    flex: 1,
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: '800',
+    color: '#D75A18',
+  },
+  actionGap: {
+    gap: 12,
+  },
+  sectionCard: {
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    gap: 14,
+  },
+  sectionTitle: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
   sectionSubtitle: {
-    marginTop: 8,
-    fontSize: 19,
+    fontSize: 18,
     lineHeight: 28,
     color: '#74685E',
   },
   groupList: {
-    marginTop: 18,
-    gap: 16,
+    gap: 14,
   },
   groupRow: {
+    borderRadius: 24,
+    backgroundColor: '#FFF8EF',
+    borderWidth: 1,
+    borderColor: '#EEDFCF',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 16,
+    gap: 12,
   },
   groupInfo: {
     flex: 1,
   },
   groupRight: {
     alignItems: 'flex-end',
-    gap: 12,
+    gap: 10,
     paddingTop: 4,
   },
   groupName: {
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 24,
+    lineHeight: 30,
     fontWeight: '900',
     color: '#241F1A',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   groupMeta: {
-    fontSize: 20,
-    lineHeight: 30,
+    fontSize: 17,
+    lineHeight: 24,
     color: '#5F564F',
   },
   distance: {
     marginTop: 10,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: '900',
     color: '#D75A18',
   },
   groupStatus: {
-    fontSize: 19,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 22,
     fontWeight: '900',
   },
   active: {
@@ -277,61 +260,28 @@ const styles = StyleSheet.create({
     color: '#4EB7A5',
   },
   memberCount: {
-    fontSize: 20,
-    lineHeight: 26,
+    fontSize: 17,
+    lineHeight: 22,
     fontWeight: '800',
     color: '#241F1A',
   },
   resultCard: {
-    borderRadius: 32,
+    borderRadius: 30,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 22,
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    gap: 10,
   },
   resultTitle: {
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 26,
+    lineHeight: 32,
     fontWeight: '900',
     color: '#241F1A',
-    marginBottom: 10,
   },
   resultText: {
-    fontSize: 20,
-    lineHeight: 30,
+    fontSize: 18,
+    lineHeight: 28,
     color: '#5F564F',
-  },
-  resultActions: {
-    marginTop: 18,
-    gap: 12,
-  },
-  resultButton: {
-    minHeight: 64,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#D91E12',
-  },
-  resultButtonText: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
-  resultButtonLight: {
-    minHeight: 64,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF8EF',
-    borderWidth: 1,
-    borderColor: '#F0E4D6',
-  },
-  resultButtonLightText: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '900',
-    color: '#241F1A',
   },
   pressed: {
     opacity: 0.94,

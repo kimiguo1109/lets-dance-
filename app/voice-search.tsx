@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 
+import { CardInput, GroupCard, PrimaryButton } from '@/components/dance-ui';
 import { ScreenContainer } from '@/components/screen-container';
-import { CardInput, GroupCard, PrimaryButton, SectionTitle } from '@/components/dance-ui';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AppRoutes } from '@/lib/app-routes';
 import { useDanceApp } from '@/lib/dance-app-context';
 import { appHaptics } from '@/lib/haptics';
 
@@ -29,33 +32,38 @@ export default function VoiceSearchScreen() {
   };
 
   return (
-    <ScreenContainer className="px-5 pb-6" edges={['top', 'bottom', 'left', 'right']}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24, gap: 18 }} showsVerticalScrollIndicator={false}>
-        <View className="mt-2 rounded-[30px] bg-surface px-5 py-6 border border-border gap-4">
-          <SectionTitle title="说话找地" subtitle="MVP 使用语音结果承接界面，你可以直接输入识别结果或点击常用短语模拟录音完成后的文本。" />
+    <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]" edges={['top', 'bottom', 'left', 'right']}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.topBar}>
+          <Pressable onPress={() => router.replace(AppRoutes.home)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
+            <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
+          </Pressable>
+          <Text style={styles.pageTitle}>说话找地</Text>
+          <View style={styles.placeholder} />
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.title}>语音结果承接</Text>
+          <Text style={styles.subtitle}>你可以直接输入识别出的地点，或者点常用短语快速模拟。</Text>
           <CardInput value={transcript} onChangeText={setTranscript} placeholder="例如：青年路地铁口东侧空地" />
           <PrimaryButton label="识别并搜索" icon="waveform" onPress={() => handleSearch()} />
-          <View className="gap-3">
-            <Text className="text-[18px] font-semibold text-muted">常用地点</Text>
-            <View className="flex-row flex-wrap gap-3">
-              {QUICK_PHRASES.map((item) => (
-                <View key={item} className="w-full">
-                  <PrimaryButton label={item} icon="mic.fill" tone="light" onPress={() => handleSearch(item)} />
-                </View>
-              ))}
-            </View>
+          <View style={styles.quickWrap}>
+            {QUICK_PHRASES.map((item) => (
+              <PrimaryButton key={item} label={item} icon="mic.fill" tone="light" onPress={() => handleSearch(item)} />
+            ))}
           </View>
         </View>
 
-        <View className="gap-4">
-          <SectionTitle title="搜索结果" subtitle="优先展示匹配舞团，没有匹配时提供直接导航提示。" />
+        <View style={styles.resultsWrap}>
+          <Text style={styles.title}>搜索结果</Text>
+          <Text style={styles.subtitle}>优先展示匹配舞团，没有匹配时给出直接导航提示。</Text>
           {matchedGroups.map((group) => (
-            <GroupCard key={group.id} group={group} href={`/group/${group.id}`} />
+            <GroupCard key={group.id} group={group} href={AppRoutes.group(group.id, 'voice')} />
           ))}
           {!matchedGroups.length && state.lastVoiceResult?.directNavigationLabel ? (
-            <View className="rounded-[28px] bg-surface px-5 py-5 border border-border gap-3">
-              <Text className="text-[22px] font-extrabold text-foreground">没有匹配舞团</Text>
-              <Text className="text-[18px] leading-7 text-muted">可直接导航去“{state.lastVoiceResult.directNavigationLabel}”。</Text>
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyTitle}>没有匹配舞团</Text>
+              <Text style={styles.emptyText}>可直接导航去“{state.lastVoiceResult.directNavigationLabel}”。</Text>
             </View>
           ) : null}
         </View>
@@ -63,3 +71,85 @@ export default function VoiceSearchScreen() {
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 12,
+    paddingBottom: 40,
+    gap: 16,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 6,
+  },
+  backButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  placeholder: {
+    width: 48,
+    height: 48,
+  },
+  pageTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
+  card: {
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    gap: 12,
+  },
+  title: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
+  subtitle: {
+    fontSize: 18,
+    lineHeight: 28,
+    color: '#74685E',
+  },
+  quickWrap: {
+    gap: 10,
+  },
+  resultsWrap: {
+    gap: 12,
+  },
+  emptyCard: {
+    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderWidth: 1,
+    borderColor: '#EFE3D8',
+  },
+  emptyTitle: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '900',
+    color: '#241F1A',
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 18,
+    lineHeight: 28,
+    color: '#5F564F',
+  },
+  pressed: {
+    opacity: 0.94,
+    transform: [{ scale: 0.99 }],
+  },
+});

@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router';
 
-export type RouteSource = 'home' | 'groups' | 'messages' | 'me' | 'start' | 'voice';
+export type RouteSource = 'home' | 'groups' | 'messages' | 'me' | 'start' | 'voice' | 'map';
 
 export const AppRoutes = {
   home: '/(tabs)' as const,
@@ -8,9 +8,17 @@ export const AppRoutes = {
   messages: '/(tabs)/messages' as const,
   me: '/(tabs)/me' as const,
   start: '/start-dancing' as const,
+  startFromVoice: (voiceLabel: string): Href => ({
+    pathname: '/start-dancing',
+    params: { voiceLabel },
+  }),
   voice: '/voice-search' as const,
   group: (id: string, from: RouteSource = 'groups'): Href => ({
     pathname: '/group/[id]',
+    params: { id, from },
+  }),
+  map: (id: string, from: RouteSource = 'groups'): Href => ({
+    pathname: '/map/[id]',
     params: { id, from },
   }),
   share: (groupId?: string, from: RouteSource = 'start'): Href => ({

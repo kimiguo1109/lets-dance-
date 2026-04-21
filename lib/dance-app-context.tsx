@@ -11,6 +11,7 @@ import type { AppLoginMethod, AppStateShape, DanceGroup, StartDancingResult, Use
 
 interface StartFlowOptions {
   createNew?: boolean;
+  labelOverride?: string;
 }
 
 interface DanceAppContextValue {
@@ -189,10 +190,11 @@ export function DanceAppProvider({ children }: { children: React.ReactNode }) {
 
       const nickname = state.profile?.nickname ?? '新队长';
       const createdAt = new Date().toISOString();
-      const label = '青年路与滨江路交叉口广场';
+      const label = options?.labelOverride?.trim() || '青年路与滨江路交叉口广场';
+      const groupName = label.includes('舞团') ? label : createGroupName(label);
       const newGroup: DanceGroup = {
         id: `group-${Date.now()}`,
-        name: createGroupName(label),
+        name: groupName,
         captainName: nickname,
         address: label,
         locationLabel: label,
@@ -205,7 +207,7 @@ export function DanceAppProvider({ children }: { children: React.ReactNode }) {
         lastCheckInAt: createdAt,
         createdAt,
         wechatLink: 'https://weixin.qq.com/',
-        shareMessage: '我刚创建了一个新的舞团，来一起跳舞吧。',
+        shareMessage: `我刚在${label}建了一个新的舞团，来一起跳舞吧。`,
       };
       const result: StartDancingResult = { type: 'created', group: newGroup };
       updateState((current) => ({

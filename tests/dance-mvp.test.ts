@@ -52,10 +52,20 @@ describe('dance utils', () => {
 });
 
 describe('app routes', () => {
-  it('builds typed group and share destinations with clear back targets', () => {
+  it('builds typed group, voice-start, map, and share destinations with clear back targets', () => {
     expect(AppRoutes.group('group-1', 'groups')).toEqual({
       pathname: '/group/[id]',
       params: { id: 'group-1', from: 'groups' },
+    });
+
+    expect(AppRoutes.startFromVoice('青年路广场')).toEqual({
+      pathname: '/start-dancing',
+      params: { voiceLabel: '青年路广场' },
+    });
+
+    expect(AppRoutes.map('group-3', 'home')).toEqual({
+      pathname: '/map/[id]',
+      params: { id: 'group-3', from: 'home' },
     });
 
     expect(AppRoutes.share('group-2', 'start')).toEqual({

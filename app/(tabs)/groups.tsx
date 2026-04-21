@@ -1,5 +1,6 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { AppRoutes } from '@/lib/app-routes';
@@ -8,6 +9,8 @@ import { formatDistance } from '@/lib/dance-utils';
 
 export default function GroupsScreen() {
   const { visibleGroups } = useDanceApp();
+  const insets = useSafeAreaInsets();
+  const headerTopPadding = Math.max(8, Math.min(16, insets.top * 0.18));
 
   return (
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]">
@@ -17,7 +20,7 @@ export default function GroupsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
         ListHeaderComponent={
-          <View style={styles.headerShell}>
+          <View style={[styles.headerShell, { paddingTop: headerTopPadding }]}>
             <View style={styles.headerCard}>
               <Text style={styles.title}>附近舞团</Text>
               <Text style={styles.subtitle}>按距离从近到远排列，点一下就能查看详情。</Text>
@@ -43,11 +46,9 @@ export default function GroupsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 8,
     paddingBottom: 160,
   },
   headerShell: {
-    paddingTop: 10,
     paddingBottom: 18,
   },
   headerCard: {
@@ -59,10 +60,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#EFE6DB',
     shadowColor: '#E9D8C7',
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1,
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
   title: {
     fontSize: 30,

@@ -2,24 +2,28 @@ import { useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Badge, PrimaryButton } from '@/components/dance-ui';
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AppRoutes, getBackRoute } from '@/lib/app-routes';
+import { AppRoutes, type RouteSource, getBackRoute } from '@/lib/app-routes';
 import { useDanceApp } from '@/lib/dance-app-context';
 import { appHaptics } from '@/lib/haptics';
-import { formatDistance, openNavigation } from '@/lib/dance-utils';
+import { formatDistance } from '@/lib/dance-utils';
 
 export default function GroupDetailScreen() {
   const params = useLocalSearchParams<{ id: string; from?: string }>();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { getGroupById, state, shareGroup, joinGroup, wakeGroup, setSelectedGroup } = useDanceApp();
   const group = getGroupById(params.id);
   const nickname = state.profile?.nickname ?? '舞友';
   const isCaptain = group?.captainName === nickname;
-  const backRoute = getBackRoute(params.from);
+  const routeSource = (params.from as RouteSource | undefined) ?? 'groups';
+  const backRoute = getBackRoute(routeSource);
   const imageHeight = Math.max(210, Math.min(290, width * 0.58));
+  const headerTopPadding = Math.max(8, Math.min(16, insets.top * 0.18));
 
   useEffect(() => {
     if (params.id) {
@@ -43,9 +47,9 @@ export default function GroupDetailScreen() {
     Alert.alert('加入成功', `你已经加入 ${group.name}。`);
   };
 
-  const handleNavigate = async () => {
+  const handleNavigate = () => {
     appHaptics.light();
-    await openNavigation(group.coordinates, group.locationLabel);
+    router.push(AppRoutes.map(group.id, routeSource));
   };
 
   const handleCaptainAction = async () => {
@@ -62,7 +66,7 @@ export default function GroupDetailScreen() {
   return (
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]" edges={['top', 'bottom', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerShell}>
+        <View style={[styles.headerShell, { paddingTop: headerTopPadding }]}>
           <View style={styles.topBar}>
             <Pressable onPress={() => router.replace(backRoute)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
               <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
@@ -77,7 +81,7 @@ export default function GroupDetailScreen() {
         {group.photoUri ? (
           <Image source={{ uri: group.photoUri }} style={{ width: '100%', height: imageHeight, borderRadius: 28 }} contentFit="cover" />
         ) : (
-          <View style={[styles.placeholderImage, { height: imageHeight }]}> 
+          <View style={[styles.placeholderImage, { height: imageHeight }]}>
             <Text style={styles.placeholderText}>等待今晚的舞步照片</Text>
           </View>
         )}
@@ -95,6 +99,7 @@ export default function GroupDetailScreen() {
           <Text style={styles.infoText}>集合点：{group.locationLabel}</Text>
           <Text style={styles.infoText}>最近打卡：{new Date(group.lastCheckInAt).toLocaleString('zh-CN')}</Text>
           <Text style={styles.infoText}>分享话术：{group.shareMessage}</Text>
+          <Text style={styles.tipText}>导航入口现在会先留在应用内，让你随时可以返回这一页。</Text>
         </View>
 
         <View style={styles.actionWrap}>
@@ -116,12 +121,10 @@ export default function GroupDetailScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 4,
     paddingBottom: 40,
     gap: 16,
   },
   headerShell: {
-    paddingTop: 10,
     paddingBottom: 8,
   },
   topBar: {
@@ -129,11 +132,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 24,
     backgroundColor: '#FFFDF9',
     borderWidth: 1,
     borderColor: '#EFE6DB',
+    shadowColor: '#E9D8C7',
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
   backButton: {
     width: 48,
@@ -224,6 +232,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 28,
     color: '#5F564F',
+  },
+  tipText: {
+    fontSize: 17,
+    lineHeight: 26,
+    color: '#B85A17',
   },
   actionWrap: {
     gap: 12,

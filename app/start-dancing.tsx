@@ -1,5 +1,6 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/dance-ui';
 import { ScreenContainer } from '@/components/screen-container';
@@ -20,11 +21,16 @@ function StepRow({ index, label }: { index: number; label: string }) {
 }
 
 export default function StartDancingScreen() {
+  const params = useLocalSearchParams<{ voiceLabel?: string }>();
+  const insets = useSafeAreaInsets();
   const { nearbyGroups, startDancing, state } = useDanceApp();
   const result = state.lastStartResult;
+  const voiceLabel = typeof params.voiceLabel === 'string' ? params.voiceLabel.trim() : '';
+  const shortVoiceLabel = voiceLabel.length > 8 ? `${voiceLabel.slice(0, 8)}…` : voiceLabel;
+  const headerTopPadding = Math.max(8, Math.min(16, insets.top * 0.18));
 
   const handleStart = async (forceCreate = false) => {
-    const nextResult = await startDancing({ createNew: forceCreate });
+    const nextResult = await startDancing({ createNew: forceCreate, labelOverride: voiceLabel || undefined });
     if (!nextResult) return;
     Alert.alert(nextResult.type === 'created' ? '舞团创建成功' : '加入成功', `已进入 ${nextResult.group.name}`);
   };
@@ -32,7 +38,7 @@ export default function StartDancingScreen() {
   return (
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]" edges={['top', 'bottom', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerShell}>
+        <View style={[styles.headerShell, { paddingTop: headerTopPadding }]}>
           <View style={styles.topBar}>
             <Pressable onPress={() => router.replace(AppRoutes.home)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
               <IconSymbol name="chevron.right" size={28} color="#241F1A" style={{ transform: [{ rotate: '180deg' }] }} />
@@ -47,15 +53,31 @@ export default function StartDancingScreen() {
         <View style={styles.heroCard}>
           <Text style={styles.heroTitle}>四步完成</Text>
           <Text style={styles.heroSubtitle}>定位、拍照、判断附近舞团，再自动加入或创建，主路径保持尽量简单。</Text>
+          {voiceLabel ? (
+            <View style={styles.voiceHintCard}>
+              <Text style={styles.voiceHintLabel}>我听到你说</Text>
+              <Text style={styles.voiceHintText}>{voiceLabel}</Text>
+              <Text style={styles.voiceHintSubtext}>如果附近没有同名舞团，可以直接按这个地点创建新的舞团。</Text>
+            </View>
+          ) : null}
           <View style={styles.stepsWrap}>
             <StepRow index={1} label="获取当前位置" />
             <StepRow index={2} label="拍一张现场照片" />
             <StepRow index={3} label="优先加入 200 米内舞团" />
-            <StepRow index={4} label="没有舞团时创建新舞团" />
+            <StepRow index={4} label={voiceLabel ? `没有结果时按“${shortVoiceLabel || '当前位置'}”创建` : '没有舞团时创建新舞团'} />
           </View>
           <View style={styles.actionGap}>
-            <PrimaryButton label="立即开始" icon="play.circle.fill" onPress={() => handleStart(false)} />
-            <PrimaryButton label="直接创建新的舞团" icon="plus.circle.fill" tone="light" onPress={() => handleStart(true)} />
+            {voiceLabel ? (
+              <>
+                <PrimaryButton label={`按“${shortVoiceLabel}”创建舞团`} icon="mic.fill" onPress={() => handleStart(true)} />
+                <PrimaryButton label="先看附近现成舞团" icon="person.2.fill" tone="light" onPress={() => router.push(AppRoutes.groups)} />
+              </>
+            ) : (
+              <>
+                <PrimaryButton label="立即开始" icon="play.circle.fill" onPress={() => handleStart(false)} />
+                <PrimaryButton label="直接创建新的舞团" icon="plus.circle.fill" tone="light" onPress={() => handleStart(true)} />
+              </>
+            )}
           </View>
         </View>
 
@@ -98,12 +120,10 @@ export default function StartDancingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 4,
     paddingBottom: 40,
     gap: 18,
   },
   headerShell: {
-    paddingTop: 10,
     paddingBottom: 8,
   },
   topBar: {
@@ -111,11 +131,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 24,
     backgroundColor: '#FFFDF9',
     borderWidth: 1,
     borderColor: '#EFE6DB',
+    shadowColor: '#E9D8C7',
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
   backButton: {
     width: 48,
@@ -166,6 +191,32 @@ const styles = StyleSheet.create({
   heroSubtitle: {
     fontSize: 18,
     lineHeight: 28,
+    color: '#74685E',
+  },
+  voiceHintCard: {
+    borderRadius: 24,
+    backgroundColor: '#FFF5EA',
+    borderWidth: 1,
+    borderColor: '#F3D7BC',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 6,
+  },
+  voiceHintLabel: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '800',
+    color: '#B85A17',
+  },
+  voiceHintText: {
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
+  voiceHintSubtext: {
+    fontSize: 17,
+    lineHeight: 25,
     color: '#74685E',
   },
   stepsWrap: {

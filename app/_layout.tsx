@@ -83,6 +83,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="oauth/callback" />
               <Stack.Screen name="group/[id]" />
+              <Stack.Screen name="map/[id]" />
               <Stack.Screen name="voice-search" />
               <Stack.Screen name="start-dancing" />
               <Stack.Screen name="share-card" options={{ presentation: 'transparentModal' }} />

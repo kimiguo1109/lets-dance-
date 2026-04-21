@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 
 import { ScreenContainer } from '@/components/screen-container';
@@ -18,17 +18,15 @@ export default function GroupsScreen() {
 
         <View style={styles.listWrap}>
           {visibleGroups.map((group) => (
-            <View key={group.id} style={styles.groupCard}>
-              <Text onPress={() => router.push(`/group/${group.id}`)} style={styles.groupName}>
-                {group.name}
-              </Text>
+            <Pressable key={group.id} onPress={() => router.push(`/group/${group.id}`)} style={({ pressed }) => [styles.groupCard, pressed && styles.pressed]}>
+              <Text style={styles.groupName}>{group.name}</Text>
               <Text style={styles.groupMeta}>队长：{group.captainName}</Text>
               <Text style={styles.groupMeta}>{group.address}</Text>
               <View style={styles.bottomRow}>
                 <Text style={styles.distance}>{formatDistance(group.distanceMeters)}</Text>
-                <Text style={styles.status}>{group.status === 'active' ? '活跃中' : '已休眠'}</Text>
+                <Text style={[styles.status, group.status === 'active' ? styles.active : styles.sleeping]}>{group.status === 'active' ? '活跃中' : '已休眠'}</Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
       </ScrollView>
@@ -38,7 +36,7 @@ export default function GroupsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
+    paddingTop: 14,
     paddingBottom: 144,
     gap: 18,
   },
@@ -46,7 +44,13 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 22,
-    paddingVertical: 24,
+    paddingTop: 24,
+    paddingBottom: 24,
+    shadowColor: '#E9D8C7',
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
   },
   title: {
     fontSize: 30,
@@ -57,7 +61,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 19,
-    lineHeight: 28,
+    lineHeight: 30,
     color: '#74685E',
   },
   listWrap: {
@@ -102,6 +106,15 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: 24,
     fontWeight: '800',
+  },
+  active: {
     color: '#2E9E5B',
+  },
+  sleeping: {
+    color: '#4EB7A5',
+  },
+  pressed: {
+    opacity: 0.94,
+    transform: [{ scale: 0.99 }],
   },
 });

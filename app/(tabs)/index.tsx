@@ -56,10 +56,12 @@ export default function HomeScreen() {
   return (
     <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]">
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <TopIconButton icon="line.3.horizontal" onPress={() => appHaptics.light()} />
-          <Text style={styles.brand}>跳舞吧</Text>
-          <TopIconButton icon="mic.fill" onPress={() => router.push('/voice-search')} />
+        <View style={styles.headerWrap}>
+          <View style={styles.header}>
+            <TopIconButton icon="line.3.horizontal" onPress={() => appHaptics.light()} />
+            <Text style={styles.brand}>跳舞吧</Text>
+            <TopIconButton icon="mic.fill" onPress={() => router.push('/voice-search')} />
+          </View>
         </View>
 
         <View style={styles.heroWrap}>
@@ -98,14 +100,19 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 10,
     paddingBottom: 144,
     backgroundColor: '#FBF8F2',
+  },
+  headerWrap: {
+    paddingTop: 6,
+    paddingBottom: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 8,
+    paddingTop: 4,
     paddingBottom: 18,
     borderBottomWidth: 1,
     borderBottomColor: '#EEE6DD',
@@ -125,8 +132,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   heroWrap: {
-    paddingTop: 44,
-    paddingBottom: 44,
+    paddingTop: 34,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   heroButton: {

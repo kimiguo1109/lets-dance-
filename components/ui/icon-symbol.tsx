@@ -11,9 +11,9 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
-  'figure.dance': 'directions-run',
+  'figure.dance': 'play-circle-filled',
   'person.2.fill': 'groups',
-  'person.crop.circle.fill': 'account-circle',
+  'person.crop.circle.fill': 'person',
   'location.fill': 'location-on',
   'mic.fill': 'mic',
   'camera.fill': 'photo-camera',
@@ -24,6 +24,9 @@ const MAPPING = {
   'clock.fill': 'schedule',
   'star.fill': 'star',
   'waveform': 'graphic-eq',
+  'bell.fill': 'notifications',
+  'line.3.horizontal': 'menu',
+  'play.circle.fill': 'play-circle-filled',
 } as IconMapping;
 
 export function IconSymbol({

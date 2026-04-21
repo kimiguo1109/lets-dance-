@@ -1,30 +1,107 @@
-import { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 
 import { ScreenContainer } from '@/components/screen-container';
-import { CardInput, GroupCard, SectionTitle } from '@/components/dance-ui';
 import { useDanceApp } from '@/lib/dance-app-context';
-import { searchGroups } from '@/lib/dance-utils';
+import { formatDistance } from '@/lib/dance-utils';
 
 export default function GroupsScreen() {
   const { visibleGroups } = useDanceApp();
-  const [keyword, setKeyword] = useState('');
-  const groups = useMemo(() => searchGroups(visibleGroups, keyword), [visibleGroups, keyword]);
 
   return (
-    <ScreenContainer className="px-5 pb-6">
-      <ScrollView contentContainerStyle={{ paddingBottom: 24, gap: 18 }} showsVerticalScrollIndicator={false}>
-        <View className="mt-2 gap-3">
-          <SectionTitle title="附近舞团" subtitle="按距离排序，休眠舞团会自动下沉显示。" />
-          <CardInput value={keyword} onChangeText={setKeyword} placeholder="搜索舞团名、地址或队长称呼" />
+    <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]">
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerCard}>
+          <Text style={styles.title}>附近舞团</Text>
+          <Text style={styles.subtitle}>按距离从近到远排列，点一下就能查看详情。</Text>
         </View>
-        <View className="gap-4">
-          {groups.map((group) => (
-            <GroupCard key={group.id} group={group} href={`/group/${group.id}`} />
+
+        <View style={styles.listWrap}>
+          {visibleGroups.map((group) => (
+            <View key={group.id} style={styles.groupCard}>
+              <Text onPress={() => router.push(`/group/${group.id}`)} style={styles.groupName}>
+                {group.name}
+              </Text>
+              <Text style={styles.groupMeta}>队长：{group.captainName}</Text>
+              <Text style={styles.groupMeta}>{group.address}</Text>
+              <View style={styles.bottomRow}>
+                <Text style={styles.distance}>{formatDistance(group.distanceMeters)}</Text>
+                <Text style={styles.status}>{group.status === 'active' ? '活跃中' : '已休眠'}</Text>
+              </View>
+            </View>
           ))}
-          {groups.length === 0 ? <Text className="text-[18px] leading-7 text-muted">没有找到匹配舞团，可以试试语音找地或直接开始跳舞。</Text> : null}
         </View>
       </ScrollView>
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 12,
+    paddingBottom: 144,
+    gap: 18,
+  },
+  headerCard: {
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 22,
+    paddingVertical: 24,
+  },
+  title: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '900',
+    color: '#241F1A',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 19,
+    lineHeight: 28,
+    color: '#74685E',
+  },
+  listWrap: {
+    gap: 14,
+  },
+  groupCard: {
+    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 22,
+    paddingVertical: 22,
+    shadowColor: '#D6451D',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+  groupName: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '900',
+    color: '#241F1A',
+    marginBottom: 10,
+  },
+  groupMeta: {
+    fontSize: 20,
+    lineHeight: 30,
+    color: '#5F564F',
+  },
+  bottomRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  distance: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '800',
+    color: '#D75A18',
+  },
+  status: {
+    fontSize: 19,
+    lineHeight: 24,
+    fontWeight: '800',
+    color: '#2E9E5B',
+  },
+});

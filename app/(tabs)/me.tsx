@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
-import { CardInput, PrimaryButton, ProfileAvatar, SectionTitle } from '@/components/dance-ui';
+import { ProfileAvatar } from '@/components/dance-ui';
 import { useDanceApp } from '@/lib/dance-app-context';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function MeScreen() {
   const { state, pickAvatar, updateProfile } = useDanceApp();
@@ -12,9 +13,7 @@ export default function MeScreen() {
 
   const handleAvatar = async () => {
     const uri = await pickAvatar();
-    if (uri) {
-      setAvatarUri(uri);
-    }
+    if (uri) setAvatarUri(uri);
   };
 
   const handleSave = async () => {
@@ -23,31 +22,154 @@ export default function MeScreen() {
       avatarUri,
       loginMethod: state.profile?.loginMethod ?? 'phone',
     });
-    Alert.alert('资料已更新', '你的头像和昵称已经保存。');
+    Alert.alert('已保存', '你的资料已经更新。');
   };
 
   return (
-    <ScreenContainer className="px-5 pb-6">
-      <ScrollView contentContainerStyle={{ paddingBottom: 24, gap: 20 }} showsVerticalScrollIndicator={false}>
-        <View className="mt-2 rounded-[32px] bg-surface px-5 py-6 border border-border gap-5">
-          <SectionTitle title="我的资料" subtitle="MVP 阶段支持头像与昵称设置，保持操作尽量简单。" />
-          <View className="items-center gap-4">
+    <ScreenContainer className="px-5" containerClassName="bg-[#FBF8F2]" safeAreaClassName="bg-[#FBF8F2]">
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.card}>
+          <Text style={styles.title}>我的</Text>
+          <Text style={styles.subtitle}>只保留老人最常用的头像和昵称设置。</Text>
+
+          <View style={styles.avatarSection}>
             <ProfileAvatar uri={avatarUri} fallback={nickname || '舞'} />
-            <View className="w-full">
-              <PrimaryButton label="从相册选择头像" icon="camera.fill" tone="light" onPress={handleAvatar} />
-            </View>
+            <Pressable onPress={handleAvatar} style={({ pressed }) => [styles.pickButton, pressed && styles.pressed]}>
+              <IconSymbol name="camera.fill" size={26} color="#FFFFFF" />
+              <Text style={styles.pickButtonText}>换头像</Text>
+            </Pressable>
           </View>
-          <View className="gap-3">
-            <Text className="text-[18px] font-semibold text-muted">昵称</Text>
-            <CardInput value={nickname} onChangeText={setNickname} placeholder="请输入你的称呼，例如 王阿姨" />
+
+          <View style={styles.fieldWrap}>
+            <Text style={styles.fieldLabel}>昵称</Text>
+            <TextInput
+              value={nickname}
+              onChangeText={setNickname}
+              placeholder="请输入你的称呼"
+              placeholderTextColor="#9C8D84"
+              style={styles.input}
+              returnKeyType="done"
+            />
           </View>
-          <View className="gap-3 rounded-[24px] bg-background px-4 py-4">
-            <Text className="text-[18px] font-bold text-foreground">当前登录方式</Text>
-            <Text className="text-[18px] leading-7 text-muted">{state.profile?.loginMethod === 'wechat' ? '微信登录' : state.profile?.loginMethod === 'douyin' ? '抖音登录' : '手机号登录'}</Text>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.infoTitle}>当前登录方式</Text>
+            <Text style={styles.infoValue}>
+              {state.profile?.loginMethod === 'wechat'
+                ? '微信登录'
+                : state.profile?.loginMethod === 'douyin'
+                  ? '抖音登录'
+                  : '手机号登录'}
+            </Text>
           </View>
-          <PrimaryButton label="保存资料" icon="star.fill" onPress={handleSave} />
+
+          <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, pressed && styles.pressed]}>
+            <Text style={styles.saveButtonText}>保存资料</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 12,
+    paddingBottom: 144,
+  },
+  card: {
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 22,
+    paddingVertical: 24,
+  },
+  title: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '900',
+    color: '#241F1A',
+  },
+  subtitle: {
+    marginTop: 8,
+    fontSize: 19,
+    lineHeight: 28,
+    color: '#74685E',
+  },
+  avatarSection: {
+    alignItems: 'center',
+    paddingVertical: 28,
+    gap: 16,
+  },
+  pickButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 24,
+    backgroundColor: '#FF7A12',
+  },
+  pickButtonText: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  fieldWrap: {
+    gap: 10,
+    marginBottom: 18,
+  },
+  fieldLabel: {
+    fontSize: 21,
+    lineHeight: 28,
+    fontWeight: '800',
+    color: '#241F1A',
+  },
+  input: {
+    borderRadius: 24,
+    backgroundColor: '#F6F1EA',
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '700',
+    color: '#241F1A',
+  },
+  infoCard: {
+    borderRadius: 24,
+    backgroundColor: '#FBF8F2',
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    marginBottom: 20,
+  },
+  infoTitle: {
+    fontSize: 20,
+    lineHeight: 26,
+    fontWeight: '800',
+    color: '#241F1A',
+    marginBottom: 8,
+  },
+  infoValue: {
+    fontSize: 21,
+    lineHeight: 28,
+    color: '#74685E',
+  },
+  saveButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 26,
+    backgroundColor: '#D91E12',
+    paddingVertical: 18,
+  },
+  saveButtonText: {
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  pressed: {
+    opacity: 0.93,
+    transform: [{ scale: 0.98 }],
+  },
+});
